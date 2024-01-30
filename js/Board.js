@@ -5,6 +5,7 @@ class Board {
     this.config = {
       color: `#${params.get('color') || 'F3C'}`,
       fontSize: parseInt(params.get('size') || 30),
+      horizontal: params.get('horizontal') === 'true',
       dimStrength: 0.125,
       drawInterval: 100,
       processQueueInterval: 50,
@@ -21,7 +22,9 @@ class Board {
     this.nCols = parseInt(this.width / this.config.fontSize);
     this.nRows = parseInt(this.height / this.config.fontSize);
 
-    this.columns = new Columns(this.nCols);
+    this.columns = new Columns(
+      this.config.horizontal ? this.nRows : this.nCols
+    );
     this.queue = [];
   }
   /**
@@ -46,7 +49,11 @@ class Board {
       if (col.isAvailable()) continue;
       const x = col.x * this.config.fontSize;
       const y = col.y * this.config.fontSize;
-      this.context.fillText(col.nextLetter(), x, y);
+      this.context.fillText(
+        col.nextLetter(),
+        this.config.horizontal ? y : x,
+        this.config.horizontal ? x : y
+      );
     }
   }
   /**
@@ -135,7 +142,8 @@ class Column {
     }
     const letter = this.message.slice(0, 1);
     this.message = this.message.slice(1);
-    this.y = this.isAvailable() ? 1 : (this.y % BOARD.nRows) + 1;
+    const maxLength = BOARD.config.horizontal ? BOARD.nCols : BOARD.nRows;
+    this.y = this.isAvailable() ? 1 : (this.y % maxLength) + 1;
     return letter;
   }
 }
