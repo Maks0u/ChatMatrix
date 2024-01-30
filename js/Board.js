@@ -1,5 +1,15 @@
 class Board {
   constructor() {
+    const params = new URLSearchParams(location.search);
+
+    this.config = {
+      color: `#${params.get('color') || 'F3C'}`,
+      fontSize: parseInt(params.get('size') || 30),
+      dimStrength: 0.125,
+      drawInterval: 100,
+      processQueueInterval: 50,
+    };
+
     const canvas = document.getElementById('Matrix');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -8,16 +18,8 @@ class Board {
     this.width = canvas.width;
     this.height = canvas.height;
 
-    const params = new URLSearchParams(location.search);
-    this.color = `#${params.get('color') || 'F3C'}`;
-    this.fontSize = parseInt(`${params.get('size') || '30'}`);
-
-    this.dimStrength = 0.125;
-    this.drawInterval = 100;
-    this.processQueueInterval = 50;
-
-    this.nCols = parseInt(this.width / this.fontSize);
-    this.nRows = parseInt(this.height / this.fontSize);
+    this.nCols = parseInt(this.width / this.config.fontSize);
+    this.nRows = parseInt(this.height / this.config.fontSize);
 
     this.columns = new Columns(this.nCols);
     this.queue = [];
@@ -27,23 +29,23 @@ class Board {
    * @returns {Board}
    */
   start() {
-    setInterval(this.draw.bind(this), this.drawInterval);
-    setInterval(this.processQueue.bind(this), this.processQueueInterval);
+    setInterval(this.draw.bind(this), this.config.drawInterval);
+    setInterval(this.processQueue.bind(this), this.config.processQueueInterval);
     return this;
   }
   /**
    * Main function
    */
   draw() {
-    this.context.fillStyle = `rgba(0, 0, 0, ${this.dimStrength})`;
+    this.context.fillStyle = `rgba(0, 0, 0, ${this.config.dimStrength})`;
     this.context.fillRect(0, 0, this.width, this.height);
-    this.context.fillStyle = this.color;
-    this.context.font = this.fontSize + 'px monospace';
+    this.context.fillStyle = this.config.color;
+    this.context.font = this.config.fontSize + 'px monospace';
 
     for (const col of this.columns.values()) {
       if (col.isAvailable()) continue;
-      const x = col.x * this.fontSize;
-      const y = col.y * this.fontSize;
+      const x = col.x * this.config.fontSize;
+      const y = col.y * this.config.fontSize;
       this.context.fillText(col.nextLetter(), x, y);
     }
   }
