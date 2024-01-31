@@ -4,10 +4,11 @@ class Board {
 
     this.config = {
       color: `#${params.get('color') || 'F3C'}`,
-      fontSize: parseInt(params.get('size') || 30),
-      horizontal: params.get('horizontal') === 'true',
+      debug: params.get('debug') === 'true',
       dimStrength: 0.125,
       drawInterval: 100,
+      fontSize: parseInt(params.get('size') || 30),
+      horizontal: params.get('horizontal') === 'true',
       processQueueInterval: 50,
     };
 
@@ -19,8 +20,8 @@ class Board {
     this.width = canvas.width;
     this.height = canvas.height;
 
-    this.nCols = parseInt(this.width / this.config.fontSize);
-    this.nRows = parseInt(this.height / this.config.fontSize);
+    this.nCols = parseInt(this.width / this.config.fontSize) - 1;
+    this.nRows = parseInt(this.height / this.config.fontSize) - 1;
 
     this.columns = new Columns(
       this.config.horizontal ? this.nRows : this.nCols
@@ -44,6 +45,8 @@ class Board {
     this.context.fillRect(0, 0, this.width, this.height);
     this.context.fillStyle = this.config.color;
     this.context.font = this.config.fontSize + 'px monospace';
+
+    if (this.config.debug) this.debug();
 
     for (const col of this.columns.values()) {
       if (col.isAvailable()) continue;
@@ -71,6 +74,21 @@ class Board {
   newMsg(msg) {
     this.queue.push(msg);
   }
+  /**
+   * Diaplay markers in board corners
+   */
+  debug() {
+    const x_min = this.config.fontSize;
+    const y_min = this.config.fontSize;
+    const x_max = BOARD.nCols * this.config.fontSize;
+    const y_max = BOARD.nRows * this.config.fontSize;
+    [
+      ['+', x_min, y_min],
+      ['+', x_max, y_min],
+      ['+', x_min, y_max],
+      ['+', x_max, y_max],
+    ].forEach(([marker, x, y]) => this.context.fillText(marker, x, y));
+  }
 }
 
 /**
@@ -82,7 +100,7 @@ class Columns extends Map {
    * @param {number} n
    */
   constructor(n = 0) {
-    super([...Array(n).keys()].map(i => [i, new Column(i)]));
+    super([...Array(n).keys()].map(i => [i + 1, new Column(i + 1)]));
   }
   /**
    * Display a message to a random available column

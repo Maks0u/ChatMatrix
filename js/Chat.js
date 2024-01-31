@@ -7,14 +7,19 @@ class Chat extends WebSocket {
     super(url);
     this.board = board;
 
+    const params = new URLSearchParams(location.search);
+    this.config = {
+      token: params.get('token'),
+      channel: params.get('channel'),
+    };
+
     /**
      * Auth
      */
     this.onopen = () => {
-      const params = new URLSearchParams(location.search);
-      this.send(`PASS oauth:${params.get('token')}`);
+      this.send(`PASS oauth:${this.config.token}`);
       this.send('NICK Bot');
-      this.send(`JOIN #${params.get('channel')}`);
+      this.send(`JOIN #${this.config.channel}`);
     };
     /**
      * @param {MessageEvent} message
