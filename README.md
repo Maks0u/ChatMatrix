@@ -18,3 +18,5 @@
 > ```text
 > ChatMatrix.html?token=<your_token>&channel=maks0u__&color=FFF&horizontal=true&size=20
 > ```
+
+[Live demo](https://maks0u.github.io/ChatMatrix/ChatMatrix.html?token=null&channel=maks0u__&size=20)
