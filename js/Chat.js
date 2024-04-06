@@ -31,7 +31,17 @@ class Chat extends WebSocket {
         this.sendPong(string);
         return;
       }
-      if (!isMsg(string)) return;
+
+      if (isNotice(string)) {
+        console.warn(string);
+        alert(string);
+        return;
+      }
+
+      if (!isMsg(string)) {
+        console.warn(string);
+        return;
+      }
 
       const msg = parseMsg(string);
       this.board.newMsg(`${msg.user} \u00b7 ${msg.message.toUpperCase()}`);
@@ -55,6 +65,13 @@ class Chat extends WebSocket {
  */
 function isPing(string) {
   return /^PING\s/gm.test(string);
+}
+/**
+ * @param {string} string
+ * @returns {boolean}
+ */
+function isNotice(string) {
+  return /NOTICE/gm.test(string);
 }
 /**
  * @param {string} string
